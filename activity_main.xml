@@ -1,0 +1,192 @@
+package com.example.abhi.sqlitedemo;
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+
+public class SQLiteDemo extends Activity
+{
+    ListView lv1;
+    SQLiteDatabase db;
+    ArrayList<Student> al = new ArrayList<>();
+    StudentAdapter ad;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        lv1 = (ListView) findViewById(R.id.lv1);
+        ad = new StudentAdapter();
+        lv1.setAdapter(ad);
+    }
+
+
+    public void createDB(View view)
+    {
+        db = openOrCreateDatabase("MyDB",MODE_PRIVATE,null);
+        Toast.makeText(getBaseContext(),"DB Created",Toast.LENGTH_LONG).show();
+    }
+
+    public void createTable(View view)
+    {
+        db.execSQL("CREATE TABLE IF NOT EXISTS student(rollno number primary key, name varchar,marks real)");
+        Toast.makeText(getBaseContext(), "Table Created", Toast.LENGTH_SHORT).show();
+    }
+
+    public void view(View view)
+    {
+        fetchDataFromDataBase();
+        Toast.makeText(SQLiteDemo.this, "Data Fetched Successfully", Toast.LENGTH_SHORT).show();
+    }
+
+    public void insertRow(View view)
+    {
+        final Dialog d = new Dialog(this);
+        d.setContentView(R.layout.layout_for_insert_row);
+        d.setTitle("Insert Data");
+        final EditText etRollno = (EditText) d.findViewById(R.id.etRollno);
+        final EditText etName = (EditText) d.findViewById(R.id.etName);
+        final EditText etMarks = (EditText) d.findViewById(R.id.etMarks);
+        Button btInsert = (Button) d.findViewById(R.id.btInsert);
+        Button btCancel = (Button) d.findViewById(R.id.btCancel);
+
+        btInsert.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                int rollno = Integer.parseInt(etRollno.getText().toString());
+                String name = etName.getText().toString();
+                double marks = Double.parseDouble(etMarks.getText().toString());
+
+                String query = "INSERT INTO student values(" + rollno + ",'" + name + "',"+ marks + ")";
+
+                db.execSQL(query);
+
+                Toast.makeText(getBaseContext(), "RECORD INSERTED", Toast.LENGTH_SHORT).show();
+
+                fetchDataFromDataBase();
+
+                d.dismiss();
+            }
+        });
+
+        btCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                d.dismiss();
+            }
+        });
+
+
+        d.show();
+    }
+
+    public void updateRow(View view)
+    {
+        db.execSQL("UPDATE student SET name='Hello' WHERE rollno=2");
+        Toast.makeText(this, "RECORD UPDATED", Toast.LENGTH_SHORT).show();
+        fetchDataFromDataBase();
+    }
+
+    public void deleteRow(View view)
+    {
+        db.execSQL("DELETE FROM student WHERE rollno=1");
+        Toast.makeText(this, "RECORD DELETED", Toast.LENGTH_SHORT).show();
+        fetchDataFromDataBase();
+    }
+
+    void fetchDataFromDataBase()
+    {
+        al.clear();
+
+        Cursor c = db.query("student", null, null, null, null, null, "rollno desc");
+
+        while (c.moveToNext())
+        {
+            int r = c.getInt(c.getColumnIndex("rollno"));
+            String n = c.getString(c.getColumnIndex("name"));
+            double m = c.getDouble(c.getColumnIndex("marks"));
+            al.add(new Student(r,n,m));
+        }
+
+        ad.notifyDataSetChanged();
+    }
+
+
+
+    class Student
+    {
+        int rollno;
+        String name;
+        double marks;
+
+        public Student(int rollno, String name, double marks)
+        {
+            this.rollno = rollno;
+            this.name = name;
+            this.marks = marks;
+        }
+    }
+
+    class StudentAdapter extends BaseAdapter
+    {
+
+        @Override
+        public int getCount()
+        {
+            return al.size();
+        }
+
+        @Override
+        public Object getItem(int position)
+        {
+            return al.get(position);
+        }
+
+        @Override
+        public long getItemId(int position)
+        {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View singleView, ViewGroup parent)
+        {
+
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            singleView = inflater.inflate(R.layout.student_single_list_item,
+                    parent,false);
+
+            TextView tvRollno = (TextView) singleView.findViewById(R.id.tvrollno);
+            TextView tvName = (TextView)singleView.findViewById(R.id.tvname);
+            TextView tvMarks = (TextView)singleView.findViewById(R.id.tvmarks);
+
+            tvRollno.setText(al.get(position).rollno+"");
+            tvName.setText(al.get(position).name);
+            tvMarks.setText(al.get(position).marks+"");
+
+            return singleView;
+        }
+    }
+
+
+}
