@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
+    android:background="@color/black"
     android:layout_height="match_parent"
     tools:context="com.example.abhi.dms.MainActivity">
 
@@ -18,20 +19,20 @@
             android:layout_height="wrap_content"
             android:text="I want to"
             android:textAlignment="center"
-            android:textColor="@color/colorPrimary"
-            android:textSize="30sp" />
+            android:textColor="@android:color/background_light"
+            android:textSize="25sp" />
 
         <Button
             android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="116dp"
-            android:background="@android:color/holo_red_dark"
-            android:backgroundTint="@android:color/holo_red_dark"
+            android:background="@android:color/black"
+            android:backgroundTint="@android:color/black"
             android:backgroundTintMode="src_over"
             android:onClick="donate"
             android:text="Donate"
             android:textColor="@android:color/background_light"
-            android:textSize="30sp" />
+            android:textSize="40sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -42,11 +43,11 @@
             android:id="@+id/button2"
             android:layout_width="match_parent"
             android:layout_height="124dp"
-            android:background="@android:color/holo_red_dark"
+            android:background="@android:color/black"
             android:onClick="receive"
             android:text="Receive"
             android:textColor="@android:color/background_light"
-            android:textSize="30sp" />
+            android:textSize="40sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,7 +58,8 @@
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@android:drawable/alert_dark_frame" />
+                android:scaleType="fitXY"
+                android:src="@drawable/homeimg" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
